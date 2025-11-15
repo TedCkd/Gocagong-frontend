@@ -42,8 +42,13 @@ dependencies {
         androidTestImplementation("androidx.test.ext:junit:1.3.0")
         androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
+        // 사진 파일 조정
         implementation("com.github.bumptech.glide:glide:4.16.0")
         annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+        // 서버연결
+        implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+        implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     }
 
 }

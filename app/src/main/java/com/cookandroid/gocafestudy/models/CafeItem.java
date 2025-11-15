@@ -1,4 +1,4 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.models;
 
 public class CafeItem {
     private String name;
@@ -8,6 +8,18 @@ public class CafeItem {
     public CafeItem(String name, String location, String imageUrl) {
         this.name = name;
         this.location = location;
+        this.imageUrl = imageUrl;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 

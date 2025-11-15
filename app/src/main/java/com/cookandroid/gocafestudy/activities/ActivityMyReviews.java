@@ -1,10 +1,16 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.activities;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.cookandroid.gocafestudy.datas.MockData;
+import com.cookandroid.gocafestudy.models.MyReviewItem;
+import com.cookandroid.gocafestudy.adapters.MyReviewsAdapter;
+import com.cookandroid.gocafestudy.R;
+import com.cookandroid.gocafestudy.models.Review;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,29 +30,18 @@ public class ActivityMyReviews extends AppCompatActivity {
         rvMyReviews = findViewById(R.id.rv_my_reviews);
         rvMyReviews.setLayoutManager(new LinearLayoutManager(this));
 
-        // ⭐ 예시 데이터 3개 추가
+        List<Review> allReviews = MockData.getReviews();
         myReviewList = new ArrayList<>();
-        myReviewList.add(new MyReviewItem(
-                "스타벅스 송도점",
-                "음료도 맛있고 자리도 편해서 공부하기 좋았습니다.",
-                "https://picsum.photos/100",
-                5
-        ));
-
-        myReviewList.add(new MyReviewItem(
-                "메가커피 인천대입구점",
-                "싸고 맛있긴 한데 사람이 너무 많아요.",
-                "https://picsum.photos/101",
-                4
-        ));
-
-        myReviewList.add(new MyReviewItem(
-                "빽다방 연수점",
-                "아메리카노는 괜찮았는데 소음이 좀 심했어요.",
-                "https://picsum.photos/102",
-                3
-        ));
-
+        for (Review r : allReviews) {
+            if (r.getUserId() == 1) { // 내 리뷰만
+                myReviewList.add(new MyReviewItem(
+                        r.getCafeName(),
+                        r.getContent(),
+                        r.getCafeImageUrl(),
+                        r.getRating()
+                ));
+            }
+        }
         // 어댑터 연결
         MyReviewsAdapter adapter = new MyReviewsAdapter(this, myReviewList);
         rvMyReviews.setAdapter(adapter);

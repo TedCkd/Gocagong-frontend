@@ -1,9 +1,16 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.activities;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import com.cookandroid.gocafestudy.fragments.MapFragment;
+import com.cookandroid.gocafestudy.fragments.MyFragment;
+import com.cookandroid.gocafestudy.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+
     }
 
     private void loadFragment(Fragment fragment) {

@@ -1,4 +1,4 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.cookandroid.gocafestudy.models.MyReviewItem;
+import com.cookandroid.gocafestudy.R;
 
 import java.util.List;
 

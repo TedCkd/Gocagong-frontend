@@ -1,47 +1,50 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.fragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.cookandroid.gocafestudy.R;
+import com.cookandroid.gocafestudy.activities.ActivityReviewList;
+import com.cookandroid.gocafestudy.models.Cafe;
+import com.cookandroid.gocafestudy.repository.MockRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraUpdate;
+import com.naver.maps.map.LocationTrackingMode;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.overlay.Marker;
-
-// ★ 추가 import
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.widget.Button;
-import android.widget.ImageView;
-
-import androidx.core.content.ContextCompat;
-import com.naver.maps.map.LocationTrackingMode;
 import com.naver.maps.map.util.FusedLocationSource;
+
+import java.util.List;
 
 public class MapFragment extends Fragment {
 
-    // ★ 현재 위치 추적에 필요한 필드
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationSource locationSource;
     private NaverMap naverMapRef;
 
-
+    private MockRepository repository;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        repository = new MockRepository();  // 목 레포지토리 초기화
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -50,14 +53,12 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentManager fm = getChildFragmentManager();
-
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
+        // NaverMap 프래그먼트 초기화
         Fragment existing = fm.findFragmentById(R.id.naver_map_fragment);
-
         if (existing == null) {
-            com.naver.maps.map.MapFragment naverMapFragment =
-                    com.naver.maps.map.MapFragment.newInstance();
+            com.naver.maps.map.MapFragment naverMapFragment = com.naver.maps.map.MapFragment.newInstance();
             fm.beginTransaction()
                     .replace(R.id.map_container, naverMapFragment, "naver_map_fragment_tag")
                     .commitNow();
@@ -65,23 +66,7 @@ public class MapFragment extends Fragment {
         } else {
             ((com.naver.maps.map.MapFragment) existing).getMapAsync(this::onMapReady);
         }
-
-        View mapContainer = view.findViewById(R.id.map_container);
-        if (mapContainer != null) {
-            mapContainer.setOnClickListener(v -> {
-                // showCafeDetailBottomSheet();
-            });
-        }
     }
-
-
-
-
-
-
-
-
-
 
     private void onMapReady(@NonNull NaverMap naverMap) {
         this.naverMapRef = naverMap;
@@ -89,34 +74,41 @@ public class MapFragment extends Fragment {
         naverMapRef.setLocationSource(locationSource);
         naverMapRef.getUiSettings().setLocationButtonEnabled(true);
 
+        // 기본 위치 설정
         LatLng center = new LatLng(37.3982989, 126.6337295);
         naverMapRef.moveCamera(CameraUpdate.scrollTo(center));
 
-        Marker marker = new Marker();
-        marker.setPosition(center);
-        marker.setMap(naverMapRef);
+        // -------------------------
+        // 목데이터 기반 마커 생성
+        // -------------------------
+        List<Cafe> cafeList = repository.getCafes();
+        for (Cafe cafe : cafeList) {
 
-        marker.setOnClickListener(overlay -> {
-            showCafeDetailBottomSheet();
-            return true;
-        });
+            Marker marker = new Marker();
+            marker.setPosition(new LatLng(cafe.getLatitude(), cafe.getLongitude()));
+            marker.setMap(naverMapRef);
+
+            marker.setOnClickListener(overlay -> {
+                showCafeDetailBottomSheet(cafe.getCafeId());
+                return true;
+            });
+        }
 
         ensureLocationTracking();
     }
 
     private void ensureLocationTracking() {
-        boolean fineGranted = ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        boolean coarseGranted = ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean fineGranted = ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean coarseGranted = ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         if (fineGranted || coarseGranted) {
             if (naverMapRef != null) {
                 naverMapRef.setLocationTrackingMode(LocationTrackingMode.Follow);
             }
         } else {
-            requestPermissions(
-                    new String[]{
+            requestPermissions(new String[]{
                             Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION
                     },
@@ -124,7 +116,6 @@ public class MapFragment extends Fragment {
             );
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -143,32 +134,47 @@ public class MapFragment extends Fragment {
                     naverMapRef.setLocationTrackingMode(LocationTrackingMode.None);
                 }
             }
-            return;
         }
     }
 
-    private void showCafeDetailBottomSheet() {
-        if (getContext() == null) return;
 
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-        View bottomSheetView = getLayoutInflater().inflate(
-                R.layout.bottom_sheet_cafe_detail,
-                null
-        );
+    // ===============================================================
+    // ⭐ 카페 상세 BottomSheet + 리뷰보기 버튼 연결
+    // ===============================================================
+    private void showCafeDetailBottomSheet(int cafeId) {
 
-        // 리뷰보기 버튼 클릭 시 ActivityReviewList로 이동
-        Button btnViewAllSaved = bottomSheetView.findViewById(R.id.btn_view_all_saved);
-        btnViewAllSaved.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), ActivityReviewList.class);
+        Cafe cafe = repository.getCafeById(cafeId);
+        if (cafe == null) return;
+
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View v = getLayoutInflater().inflate(R.layout.bottom_sheet_cafe_detail, null);
+
+        TextView tvName = v.findViewById(R.id.tv_cafe_name);
+        TextView tvAddress = v.findViewById(R.id.tv_address);
+        ImageView ivImage = v.findViewById(R.id.iv_cafe_image);
+
+        // 리뷰보기 버튼 (✔ 여기가 핵심)
+        Button btnReview = v.findViewById(R.id.btn_view_all_saved);
+
+        // 데이터 적용
+        tvName.setText(cafe.getName());
+        tvAddress.setText(cafe.getAddress());
+
+        if (!cafe.getPhotos().isEmpty()) {
+            ivImage.setImageResource(R.drawable.ic_cafe1_img);
+        }
+
+        // -------------------------------------------------------
+        // ⭐ 리뷰 보기 버튼 → ActivityReviewList로 카페ID 전달
+        // -------------------------------------------------------
+        btnReview.setOnClickListener(click -> {
+            Intent intent = new Intent(requireContext(), ActivityReviewList.class);
+            intent.putExtra("cafeId", cafeId);
             startActivity(intent);
-            bottomSheetDialog.dismiss(); // BottomSheet 닫기
+            dialog.dismiss();
         });
 
-        // TODO: bottomSheetView.findViewById(...)로 카페 데이터 바인딩
-        ImageView cafeImage = bottomSheetView.findViewById(R.id.iv_cafe_image);
-        cafeImage.setImageResource(R.drawable.ic_cafe1_img);
-
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
+        dialog.setContentView(v);
+        dialog.show();
     }
 }

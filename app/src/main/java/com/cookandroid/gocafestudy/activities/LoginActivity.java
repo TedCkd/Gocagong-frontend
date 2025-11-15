@@ -1,8 +1,10 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.cookandroid.gocafestudy.R;
 import com.google.android.material.button.MaterialButton;
 
 public class LoginActivity extends AppCompatActivity {

@@ -33,7 +33,7 @@
             android:value="ueeelrxqfj" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,13 +42,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="false" />
 
-        <activity android:name=".ActivityMyReviews" />
-        <activity android:name=".ActivityReviewList" />
-        <activity android:name=".ActivityWriteReview" />
-        <activity android:name=".ActivitySavedCafes" />
+        <activity android:name=".activities.ActivityMyReviews" />
+        <activity android:name=".activities.ActivityReviewList" />
+        <activity android:name=".activities.ActivityWriteReview" />
+        <activity android:name=".activities.ActivitySavedCafes" />
 
 
     </application>

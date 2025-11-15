@@ -1,10 +1,16 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.activities;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ImageButton;
+
+import com.cookandroid.gocafestudy.adapters.SavedCafesAdapter;
+import com.cookandroid.gocafestudy.datas.MockData;
+import com.cookandroid.gocafestudy.models.Bookmark;
+import com.cookandroid.gocafestudy.models.CafeItem;
+import com.cookandroid.gocafestudy.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +30,19 @@ public class ActivitySavedCafes extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        // 초기 더미 데이터 (나중에 서버에서 받아오는 데이터로 대체)
+        // MockData에서 북마크 가져와서 CafeItem으로 변환
         cafeList = new ArrayList<>();
-        cafeList.add(new CafeItem("카페 모닝", "서울 강남구", "https://example.com/image1.jpg"));
-        cafeList.add(new CafeItem("카페 브런치", "서울 서초구", "https://example.com/image2.jpg"));
-        cafeList.add(new CafeItem("카페 오후", "서울 송파구", "https://example.com/image3.jpg"));
+        List<Bookmark> bookmarks = MockData.getBookmarks();
+        for (Bookmark b : bookmarks) {
+            cafeList.add(new CafeItem(
+                    b.getCafeName(),
+                    b.getAddress(),
+                    b.getMainImageUrl()
+            ));
+        }
 
         adapter = new SavedCafesAdapter(this, cafeList);
         rvSavedCafes.setLayoutManager(new LinearLayoutManager(this));
         rvSavedCafes.setAdapter(adapter);
     }
-
-    // 서버 연동 시 fetchSavedCafes() 같은 함수 만들어서 데이터 가져오기 가능
 }

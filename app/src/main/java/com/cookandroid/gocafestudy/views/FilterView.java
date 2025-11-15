@@ -1,4 +1,4 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.views;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -14,6 +14,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+
+import com.cookandroid.gocafestudy.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

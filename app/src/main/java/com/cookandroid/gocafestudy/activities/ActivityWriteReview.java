@@ -1,4 +1,4 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.activities;
 
 import android.Manifest;
 import android.graphics.Bitmap;
@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.pm.PackageManager;
+
+import com.cookandroid.gocafestudy.R;
 
 public class ActivityWriteReview extends AppCompatActivity {
 

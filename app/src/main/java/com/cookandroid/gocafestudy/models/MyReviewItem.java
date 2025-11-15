@@ -1,4 +1,4 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.models;
 
 public class MyReviewItem {
 

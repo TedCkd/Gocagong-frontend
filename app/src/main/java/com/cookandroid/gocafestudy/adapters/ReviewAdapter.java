@@ -1,5 +1,6 @@
-package com.cookandroid.gocafestudy;
+package com.cookandroid.gocafestudy.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +10,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cookandroid.gocafestudy.R;
+import com.cookandroid.gocafestudy.models.Review;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
-    private List<ReviewModel> reviewList;
+    private List<Review> reviewList;
 
-    public ReviewAdapter(List<ReviewModel> reviewList) {
+    public ReviewAdapter(List<Review> reviewList) {
         this.reviewList = reviewList;
     }
 
@@ -27,13 +33,19 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         return new ReviewViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
-        ReviewModel review = reviewList.get(position);
+        Review review = reviewList.get(position);
 
         holder.ratingBar.setRating(review.getRating());
         holder.tvReviewText.setText(review.getContent());
-        holder.tvReviewDate.setText(review.getDate());
+
+        // 날짜 형식 변환
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+        String dateString = sdf.format(review.getCreatedAt());
+
+        holder.tvReviewDate.setText(dateString);
     }
 
     @Override
@@ -43,14 +55,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
         RatingBar ratingBar;
-        TextView tvReviewText, tvReviewDate;
+        TextView tvReviewText;
+        TextView tvReviewDate; // 날짜 표시 추가
 
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ratingBar = itemView.findViewById(R.id.ratingBar);
             tvReviewText = itemView.findViewById(R.id.tvReviewText);
-            tvReviewDate = itemView.findViewById(R.id.tvReviewDate);
+            tvReviewDate = itemView.findViewById(R.id.tvReviewDate);  // 추가
         }
     }
 }

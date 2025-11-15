@@ -80,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <!-- ★ Map 위에 오버레이되는 FilterView -->
-        <com.cookandroid.gocafestudy.FilterView
+        <com.cookandroid.gocafestudy.views.FilterView
             android:id="@+id/filterView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
