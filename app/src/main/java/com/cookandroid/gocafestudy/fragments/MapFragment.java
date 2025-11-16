@@ -29,6 +29,7 @@ import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragment extends Fragment {
@@ -38,6 +39,7 @@ public class MapFragment extends Fragment {
     private NaverMap naverMapRef;
 
     private MockRepository repository;
+    private List<Marker> markerList = new ArrayList<>(); // 마커 저장
 
     @Nullable
     @Override
@@ -83,16 +85,32 @@ public class MapFragment extends Fragment {
         // -------------------------
         List<Cafe> cafeList = repository.getCafes();
         for (Cafe cafe : cafeList) {
-
             Marker marker = new Marker();
             marker.setPosition(new LatLng(cafe.getLatitude(), cafe.getLongitude()));
             marker.setMap(naverMapRef);
+            markerList.add(marker);
 
             marker.setOnClickListener(overlay -> {
                 showCafeDetailBottomSheet(cafe.getCafeId());
                 return true;
             });
         }
+
+        // -------------------------
+        // 줌 레벨에 따라 마커 크기 비례 조정
+        // -------------------------
+        naverMapRef.addOnCameraChangeListener((reason, animated) -> {
+            float zoom = (float) naverMapRef.getCameraPosition().zoom;
+            // 예: 기본 10일 때 40, 줌 증가마다 10씩 증가
+            int size = (int) (40 + (zoom - 10) * 10);
+            if (size < 20) size = 20; // 최소 크기 제한
+            if (size > 120) size = 120; // 최대 크기 제한
+
+            for (Marker marker : markerList) {
+                marker.setWidth(size);
+                marker.setHeight(size);
+            }
+        });
 
         ensureLocationTracking();
     }
@@ -137,7 +155,6 @@ public class MapFragment extends Fragment {
         }
     }
 
-
     // ===============================================================
     // ⭐ 카페 상세 BottomSheet + 리뷰보기 버튼 연결
     // ===============================================================
@@ -153,7 +170,7 @@ public class MapFragment extends Fragment {
         TextView tvAddress = v.findViewById(R.id.tv_address);
         ImageView ivImage = v.findViewById(R.id.iv_cafe_image);
 
-        // 리뷰보기 버튼 (✔ 여기가 핵심)
+        // 리뷰보기 버튼
         Button btnReview = v.findViewById(R.id.btn_view_all_saved);
 
         // 데이터 적용
@@ -164,9 +181,7 @@ public class MapFragment extends Fragment {
             ivImage.setImageResource(R.drawable.ic_cafe1_img);
         }
 
-        // -------------------------------------------------------
-        // ⭐ 리뷰 보기 버튼 → ActivityReviewList로 카페ID 전달
-        // -------------------------------------------------------
+        // 리뷰 보기 버튼 → ActivityReviewList로 카페ID 전달
         btnReview.setOnClickListener(click -> {
             Intent intent = new Intent(requireContext(), ActivityReviewList.class);
             intent.putExtra("cafeId", cafeId);
