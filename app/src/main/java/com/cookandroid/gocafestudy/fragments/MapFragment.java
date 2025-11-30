@@ -287,7 +287,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onResponse(Call<CafeDetail> call, Response<CafeDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // API 호출 성공 시 BottomSheet 표시 함수 호출
-                    displayCafeDetailSheet(response.body());
+                    displayCafeDetailSheet(cafeId, response.body());
                 } else {
                     Toast.makeText(requireContext(), "카페 상세 정보 로드 실패: " + response.code(), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Detail API Failed: " + response.code());
@@ -305,7 +305,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     /**
      * BottomSheet UI를 구성하고 표시하는 헬퍼 함수
      */
-    private void displayCafeDetailSheet(CafeDetail cafe) {
+    private void displayCafeDetailSheet(int cafeId, CafeDetail cafe) {
         if (cafe == null) return;
 
         // ⚠️ 임시 MockRepository 인스턴스 (북마크/리뷰는 아직 API 연동이 안 되었으므로 임시로 사용)
@@ -368,7 +368,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // --- 리뷰 연결 (최근 3개) ---
         // ⚠️ API 응답에 recentReviews가 없으므로 Mock 데이터를 사용하거나 null 체크 필요
-        List<Review> recentReviews = mockRepository.getCafeDetail(cafe.getCafeId()).getRecentReviews();
+        List<Review> recentReviews = mockRepository.getCafeDetail(cafeId).getRecentReviews();
         List<Review> previewReviews = new ArrayList<>();
 
         if (recentReviews != null) {
@@ -384,18 +384,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // --- 리뷰 전체보기 버튼 ---
         btnReview.setOnClickListener(click -> {
             Intent intent = new Intent(requireContext(), ActivityReviewList.class);
-            intent.putExtra("cafeId", cafe.getCafeId());
+            intent.putExtra("cafeId", cafeId);
             startActivity(intent);
             dialog.dismiss();
         });
 
         // POST 카페 저장 요청 (MockRepository 호출 유지)
         // ⚠️ API 응답에 isSaved가 없으므로 Mock 데이터를 사용하거나 false로 초기화 필요
-        boolean isSaved = mockRepository.getCafeDetail(cafe.getCafeId()).isSaved();
+        boolean isSaved = mockRepository.getCafeDetail(cafeId).isSaved();
 
         Button btnSave = v.findViewById(R.id.btn_save);
         btnSave.setOnClickListener(click -> {
-            BookmarkCreateResponse response = mockRepository.createBookmark(cafe.getCafeId());
+            BookmarkCreateResponse response = mockRepository.createBookmark(cafeId);
             Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show();
         });
 
