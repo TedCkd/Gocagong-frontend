@@ -26,8 +26,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.cookandroid.gocafestudy.R;
 import com.cookandroid.gocafestudy.activities.ActivityReviewList;
+
 import com.cookandroid.gocafestudy.adapters.ReviewAdapter;
-// [Retrofit Imports]
+
 import com.cookandroid.gocafestudy.api.CafeApi;
 import com.cookandroid.gocafestudy.repository.RetrofitClient;
 import com.cookandroid.gocafestudy.models.GET.CafeMapResponse;
@@ -42,6 +43,7 @@ import com.cookandroid.gocafestudy.models.GET.Review;
 import com.cookandroid.gocafestudy.models.POST.BookmarkCreateResponse;
 import com.cookandroid.gocafestudy.repository.MockRepository; // MockRepository는 임시로 남겨두고 필드는 제거
 import com.cookandroid.gocafestudy.views.FilterView;
+import com.cookandroid.gocafestudy.adapters.ReviewAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraUpdate;
@@ -208,14 +210,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             boolean visible = true;
 
             // 분위기 필터
-            if (appliedFilters.containsKey(" 분위기 ")) {
-                String mood = appliedFilters.get(" 분위기 ");
+            if (appliedFilters.containsKey("분위기")) {
+                String mood = appliedFilters.get("분위기");
                 if (!cafe.getMood().equals(mood)) visible = false;
             }
 
             // 아메리카노 가격 필터
-            if (appliedFilters.containsKey(" 아메리카노 가격 ")) {
-                String priceFilter = appliedFilters.get(" 아메리카노 가격 ");
+            if (appliedFilters.containsKey("아메리카노 가격")) {
+                String priceFilter = appliedFilters.get("아메리카노 가격");
                 int price = cafe.getAmericanoPrice();
                 if (priceFilter.equals("3000원 이하") && price > 3000) visible = false;
                 else if (priceFilter.equals("3000~5000원") && (price < 3000 || price > 5000)) visible = false;
