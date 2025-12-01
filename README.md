@@ -1,4 +1,4 @@
-12-01
+12-01 로그아웃과 카페 리뷰보기 구현해야함
 1. 인증
 AuthInterceptor: JWT 토큰 자동 헤더 추가
 RetrofitClient: 인증 필요/불필요 API 클라이언트 제공
