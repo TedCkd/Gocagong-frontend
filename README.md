@@ -1,13 +1,20 @@
-11-25
-유의점
-api설계도에 맞게 DTO 확인
-변수명이 안맞을시 @SerializedName
+12-01
+1. 인증
+AuthInterceptor: JWT 토큰 자동 헤더 추가
+RetrofitClient: 인증 필요/불필요 API 클라이언트 제공
 
-Retrofit으로 비동기, 에러 처리
+2. 리뷰
+내 리뷰 조회: GET /api/review/me
+리뷰 삭제: DELETE /api/review/{reviewId}
+Adapter: MyReviewsAdapter (이미지 표시, 삭제 버튼)
 
-리뷰 사진 업로드 시
-현재 Bitmap-임시 문자열("review_image_0")
-Bitmap-파일-MultipartBody로 변환 필요
+3. 북마크 (저장한 카페)
+목록 조회: GET /api/bookmarks/me
+Adapter: BookmarkAdapter
 
-유저정보는 현재 로그인 정보 미연결상태라
-목레파지토리가 아니라 하드코딩으로 존재
+4. 카페 정보
+리스트 조회: GET /api/cafes
+상세 조회: GET /api/cafes/{cafeId}
+
+5. 사용자 정보
+내 정보 조회: GET /api/users/me
