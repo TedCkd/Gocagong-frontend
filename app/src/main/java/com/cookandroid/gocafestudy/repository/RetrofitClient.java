@@ -2,6 +2,7 @@ package com.cookandroid.gocafestudy.repository;
 
 import android.content.Context;
 import com.cookandroid.gocafestudy.activities.AuthInterceptor;
+import com.cookandroid.gocafestudy.api.BookmarkApi;
 import com.cookandroid.gocafestudy.api.CafeApi;
 import com.cookandroid.gocafestudy.models.GET.UserResponse;
 import com.cookandroid.gocafestudy.api.TestAuthApi;
@@ -76,5 +77,9 @@ public class RetrofitClient {
     // 카페 API (인증 필요한 경우: 예, 리뷰 등록, 북마크)
     public static CafeApi getAuthCafeApi(Context context) {
         return getAuthClient(context).create(CafeApi.class);
+    }
+
+    public static BookmarkApi getBookmarkApi(Context context) {
+        return getAuthClient(context).create(BookmarkApi.class);
     }
 }

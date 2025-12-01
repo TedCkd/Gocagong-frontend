@@ -1,6 +1,7 @@
 package com.cookandroid.gocafestudy.fragments;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cookandroid.gocafestudy.models.GET.BookmarkIsSavedResponse;
 import com.naver.maps.map.OnMapReadyCallback;
 
 import androidx.annotation.NonNull;
@@ -302,6 +304,91 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
+    private void loadBookmarkState(Context context, int cafeId, Button btnSave) {
+
+        RetrofitClient.getBookmarkApi(context)
+                .getBookmarkState(cafeId)
+                .enqueue(new Callback<BookmarkIsSavedResponse>() {
+
+                    @Override
+                    public void onResponse(Call<BookmarkIsSavedResponse> call,
+                                           Response<BookmarkIsSavedResponse> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            boolean saved = response.body().isSaved();
+
+                            // 👉 텍스트만 변경
+                            if (saved) {
+                                btnSave.setText("저장 취소하기");
+                            } else {
+                                btnSave.setText("저장하기");
+                            }
+
+                            Log.d("Bookmark", "isSaved = " + saved);
+                        } else {
+                            Log.e("Bookmark", "조회 실패: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BookmarkIsSavedResponse> call, Throwable t) {
+                        Log.e("Bookmark", "네트워크 오류", t);
+                    }
+                });
+
+
+    }
+    private void createBookmark(Context context, int cafeId, Button btnSave) {
+
+        RetrofitClient.getBookmarkApi(context)
+                .createBookmark(cafeId)
+                .enqueue(new Callback<BookmarkCreateResponse>() {
+
+                    @Override
+                    public void onResponse(Call<BookmarkCreateResponse> call,
+                                           Response<BookmarkCreateResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            btnSave.setText("저장 취소하기");
+                            Log.d("BookmarkPOST", "저장 완료: " + response.body().getMessage());
+                        } else {
+                            Log.e("BookmarkPOST", "저장 실패: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BookmarkCreateResponse> call, Throwable t) {
+                        Log.e("BookmarkPOST", "네트워크 오류", t);
+                    }
+                });
+    }
+
+    private void deleteBookmark(Context context, int cafeId, Button btnSave) {
+
+        RetrofitClient.getBookmarkApi(context)
+                .deleteBookmark(cafeId)
+                .enqueue(new Callback<BookmarkDeleteResponse>() {
+
+                    @Override
+                    public void onResponse(Call<BookmarkDeleteResponse> call,
+                                           Response<BookmarkDeleteResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            btnSave.setText("저장하기");
+                            Log.d("BookmarkDELETE", "저장 해제됨: " + response.body().getMessage());
+                        } else {
+                            Log.e("BookmarkDELETE", "해제 실패: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BookmarkDeleteResponse> call, Throwable t) {
+                        Log.e("BookmarkDELETE", "네트워크 오류", t);
+                    }
+                });
+    }
+
+
+
+
     /**
      * BottomSheet UI를 구성하고 표시하는 헬퍼 함수
      */
@@ -389,14 +476,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             dialog.dismiss();
         });
 
+        Button btnSave = v.findViewById(R.id.btn_save);
+
+        // 👉 북마크 여부 조회
+        loadBookmarkState(getContext(), cafeId, btnSave);
+
         // POST 카페 저장 요청 (MockRepository 호출 유지)
         // ⚠️ API 응답에 isSaved가 없으므로 Mock 데이터를 사용하거나 false로 초기화 필요
-        boolean isSaved = mockRepository.getCafeDetail(cafeId).isSaved();
 
-        Button btnSave = v.findViewById(R.id.btn_save);
-        btnSave.setOnClickListener(click -> {
-            BookmarkCreateResponse response = mockRepository.createBookmark(cafeId);
-            Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show();
+        // 버튼 클릭으로 토글
+        btnSave.setOnClickListener(view -> {
+            String currentText = btnSave.getText().toString();
+
+            if (currentText.equals("저장하기")) {
+                // 저장하기 → POST
+                createBookmark(getContext(), cafeId, btnSave);
+            } else {
+                // 저장 취소하기 → DELETE
+                deleteBookmark(getContext(), cafeId, btnSave);
+            }
         });
 
         dialog.setContentView(v);

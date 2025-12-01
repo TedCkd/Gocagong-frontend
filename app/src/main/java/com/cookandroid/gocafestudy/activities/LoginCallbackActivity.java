@@ -31,7 +31,7 @@ public class LoginCallbackActivity extends AppCompatActivity {
             String accessToken = data.getQueryParameter("access_token");
 
             if (accessToken != null && !accessToken.isEmpty()) {
-                // ✅ 액세스 토큰 로그 출력 (보안을 위해 일부 마스킹 처리)
+                // ✅ 액세스 토큰 로그 출력
                 Log.d(TAG, "Access Token Received: " + accessToken);
 
                 saveAccessToken(accessToken);
